@@ -1,3 +1,12 @@
+Update 2.0:
+Added the functionality to do mirror backups, the backup pendrive will be backed up to another pendrive before actually running the differential backup, maintaining 3 versions of the same file.
+Also added error file logs, that showcases if any files were missed, in the logs folder
+
+To run it:
+docker run -d -v /source/path:/server -v /destination/path:/backup -v /mirror/path:/mirror -v /logs/path:/logs --name containername imagename
+
+Update 1.0:
+
 Hey admin,
 This is a very basic backup tool that lets you create a differental copy of your mentioned directory into a mentioned mounted directory(you will have to manually mount it) and also write logs.
 

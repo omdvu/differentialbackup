@@ -3,21 +3,19 @@ import shutil
 import json
 import stat
 import time
+import mirrorbackup
+import comparedict
 
 SERVER_PATH = os.environ.get("SERVER_PATH", "/server")
 BACKUP_PATH = os.environ.get("BACKUP_PATH", "/backup")
+MIRROR_PATH = os.environ.get("MIRROR_PATH", "/mirror")
 LOG_DIR = os.environ.get("LOG_DIR", "/logs")
 
 MOUNT_LOG_PATH = os.path.join(LOG_DIR, "mountlog.json")
 SERVER_LOG_PATH = os.path.join(LOG_DIR, "serverlog.json")
+MIRROR_LOG_PATH = os.path.join(LOG_DIR, "mirrorlog.json")
 
 SKIP_HIDDEN = set()
-
-def sort_dict(d):
-    if not isinstance(d, dict):
-        return d
-    return {k: sort_dict(d[k]) for k in sorted(d)}
-
 
 def explore(path, skipped=None):
     if skipped is None:
@@ -27,7 +25,7 @@ def explore(path, skipped=None):
     directory = {}
     try:
         for item in os.listdir(path):
-            if item in skipped:
+            if item.startswith('.') or item in skipped:
                 continue
 
             fullpath = os.path.join(path, item)
@@ -66,6 +64,10 @@ def backup(serverpath, backuppath, server_files):
         source = os.path.join(serverpath, name)
         destination = os.path.join(backuppath, name)
 
+        if isinstance(meta, dict) and "error" in meta:
+            mount_log[name] = meta
+            continue
+
         if isinstance(meta, dict) and "size" not in meta:
             os.makedirs(destination, exist_ok=True)
             mount_log[name] = backup(source, destination, meta)
@@ -102,10 +104,11 @@ def backup(serverpath, backuppath, server_files):
 def main():
     os.makedirs(LOG_DIR, exist_ok=True)
 
-    print(" Scanning source and backup directories...")
+    print("Scanning source and backup directories...")
     server_files = explore(SERVER_PATH)
 
     try:
+        mirrorbackup.mirrorbackup(BACKUP_PATH,MIRROR_PATH,MIRROR_LOG_PATH)
         current_mount_log = backup(SERVER_PATH, BACKUP_PATH, server_files)
 
         with open(MOUNT_LOG_PATH, 'w') as f:
@@ -116,10 +119,16 @@ def main():
 
         print("Backup completed successfully.")
 
+        comparedict.run_comparison(
+            MOUNT_LOG_PATH,
+            BACKUP_PATH, 
+            os.path.join(LOG_DIR, "compare_errors.txt")
+        )
+
     except Exception as e:
         print(f"Fatal: {e}")
 
 while True:
     main()
     print("Sleeping for 24 hrs")
-    time.sleep(60)
+    time.sleep(60*60*24)
