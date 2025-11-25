@@ -2,7 +2,7 @@ import os
 import shutil
 import json
 
-def mirrorbackup(sourcemnt,destmnt,mirrorlogdir):
+def mirrorbackup(sourcemnt,destmnt):
     if os.path.exists(destmnt):
         try: 
             shutil.rmtree(destmnt)

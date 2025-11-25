@@ -13,7 +13,6 @@ LOG_DIR = os.environ.get("LOG_DIR", "/logs")
 
 MOUNT_LOG_PATH = os.path.join(LOG_DIR, "mountlog.json")
 SERVER_LOG_PATH = os.path.join(LOG_DIR, "serverlog.json")
-MIRROR_LOG_PATH = os.path.join(LOG_DIR, "mirrorlog.json")
 
 SKIP_HIDDEN = set()
 
@@ -108,7 +107,7 @@ def main():
     server_files = explore(SERVER_PATH)
 
     try:
-        mirrorbackup.mirrorbackup(BACKUP_PATH,MIRROR_PATH,MIRROR_LOG_PATH)
+        mirrorbackup.mirrorbackup(BACKUP_PATH,MIRROR_PATH)
         current_mount_log = backup(SERVER_PATH, BACKUP_PATH, server_files)
 
         with open(MOUNT_LOG_PATH, 'w') as f:
