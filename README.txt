@@ -41,7 +41,7 @@ docker logs backup-photos, it will display if the backup is done, maybe sometime
 
 A special note for my Linux users, run this with sudo rights, or as root, so it can copy files and paste them without any permission error.
 
-If you face any issue, I'll be happy to help, omprajapatidv@gmail.com.
+If you face any issue, I'll be happy to help, omprajapatidv@gmail.com, abhimaradiya63@gmail.com.
 
 Regards,
-Om Prajapati
+Om, Abhi
